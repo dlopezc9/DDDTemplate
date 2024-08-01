@@ -1,34 +1,33 @@
+using Application.Users.Create;
 using Application.Users.Get;
+using Carter;
 using Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebApi.Controllers
+namespace WebApi.Controllers;
+
+public class User : ICarterModule
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class User : ControllerBase
+    public void AddRoutes(IEndpointRouteBuilder app)
     {
-        private readonly IMediator mediator;
-
-        public User(IMediator mediator)
-        {
-            this.mediator = mediator;
-        }
-
-        [HttpGet]
-        [Route("get/{id:guid}")]
-        public async Task<IActionResult> GetUserById(Guid id)
+        app.MapGet("users/{id:guid}", async (Guid id, ISender sender) =>
         {
             try
             {
-                var user = await mediator.Send(new GetUserQuery(new UserId(id)));
-                return Ok(user);
+                return Results.Ok(await sender.Send(new GetUserQuery(new UserId(id))));
             }
-            catch (UserNotFoundException ex)
+            catch (UserNotFoundException e)
             {
-                return NotFound(ex.Message);
+                return Results.NotFound(e.Message);
             }
-        }
+        });
+
+        app.MapPost("users/post", async ([FromBody] CreateUserCommand command, ISender sender) =>
+        {
+            await sender.Send(command);
+
+            return Results.Ok();
+        });
     }
 }

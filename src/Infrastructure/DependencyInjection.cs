@@ -16,7 +16,8 @@ public static class DependencyInjection
     {
         services.AddDbContext<DataContext>(options =>
             options
-            .UseSqlServer(configuration.GetConnectionString("Database")));
+            .UseSqlServer(configuration.GetConnectionString("Database"),
+            x => x.MigrationsAssembly("Infrastructure")));
 
         services.AddScoped<IDataContext>(sp =>
             sp.GetRequiredService<DataContext>());

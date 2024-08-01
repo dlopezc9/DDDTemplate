@@ -1,4 +1,7 @@
-﻿namespace Domain.Users;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Users;
 
 public class User
 {
